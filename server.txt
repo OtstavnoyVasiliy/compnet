@@ -1,57 +1,169 @@
+
 #include <iostream>
-
 #include <fstream>
-
 #include <windows.h>
-
+#include <string>
 using namespace std;
 
-struct Person{
-	char name[25];
-	int height;
-	int weight;
+struct Person
+{
+    char name[25];
+    int a[4];
 }B;
 
 int answer;
+long poz_pred;
 
+int main()
+{
+    int test = 1;
+    ifstream fR;
+    ofstream fA;
+    fstream fC;
+    setlocale(LC_ALL, "rus");
+    const char* nameR = { "H:/test/REQUEST.txt" };
+    const char* nameA = { "H:/test/ANSWER.txt" };
+    const char* con = { "H:/test/conv.txt" };
+    
+    
+
+    cout << "Server is working" << endl;
+    fC.open(con, ios::in|ios::out);
+    int t1 = 0;
+
+    fC << 0 << endl;
+    fC.close();
+   /*fR.open(nameR, ios::binary);
+    fR.seekg(0, ios::end);
+    size_pred = fR.tellg();
+    fR.close();*/ 
+    while (true)
+    {
+        fC.open(con);
+        fC.seekg(0, ios::end);
+        poz_pred = fC.tellg();
+        while (poz_pred == fC.tellg())
+        {
+            Sleep(100);
+            fC.seekg(0, ios::end);
+        }
+        fC.seekg(0, ios::beg);
+        int temp;
+        fC >> temp;
+        
+        fC << temp << endl;
+        string str = to_string(temp);
+        string s2 = "H:/test/" + str + ".txt";
+        const char* client = { s2.c_str() };
+        
+        fA.open(client, ios::app);
+
+        fC.seekg(poz_pred, ios::beg);
+        fC >> B.name >> B.a[0] >> B.a[1] >> B.a[2] >> B.a[3];
+        poz_pred = fC.tellg();
+        
+        bool stip = true, higher = true;
+        for (int i = 0; i < 4; i++)
+        {
+            if (B.a[i] != 5)
+                higher = false;
+            if (B.a[i] <= 3)
+                stip = false;
+        }
+        if (stip && higher)
+            answer = 2;
+        else
+            if (stip)
+                answer = 1;
+            else
+                answer = 0;
+        fC.seekg(0, ios::beg);
+
+        fC.close();
+
+        fA << answer;
+        fA << endl;
+        fA.close();
+    }
+}
+/*
+#include <iostream>
+#include <fstream>
+#include <windows.h>
+using namespace std;
+
+struct Person
+{
+    char name[25];
+    int a[4];
+}B;
+
+int answer;
 long size_pred;
 
-int main() {
+int main()
+{
+    int test = 1;
+    ifstream fR;
+    ofstream fA;
+    fstream fC;
+    setlocale(LC_ALL, "rus");
+    const char* nameR = { "H:/test/REQUEST.bin" };
+    const char* nameA = { "H:/test/ANSWER.bin" };
+    const char* con = { "H:/test/conv.bin" };
 
-	ifstream fR;
-	ofstream fA;
-	setlocale(LC_ALL, "rus");
-	const char* nameR = "C:\Ra\REQUEST.txt";
-	const char* nameA = "C:\Ra\ANSWER.txt";
-	cout << "server is working" << endl;
-	fR.open(nameR, ios::binary);
-	fR.seekg(0, ios::end);
 
-	size_pred = fR.tellg();
-	fR.close();
-	while (true){
 
-		fR.open(nameR, ios::binary);
-		fR.seekg(0, ios::end);
-		while (size_pred >= fR.tellg())
+    cout << "Server is working" << endl;
+    fC.open(con, ios::binary | ios::in|ios::out);
+    int t1 = 0;
+    fC.write((char*)&t1, sizeof(t1));
+   // fC << 0 << endl;
+    fC.close();
+   /*fR.open(nameR, ios::binary);
+    fR.seekg(0, ios::end);
+    size_pred = fR.tellg();
+    fR.close();*/
+/*
+while (true)
+{
+    fC.open(con, ios::binary);
+    fC.seekg(0, ios::end);
+    while (size_pred >= fC.tellg())
+    {
+        Sleep(100);
+        fC.seekg(0, ios::end);
+    }
+    fC.seekg(size_pred, ios::beg);
+    fC.read((char*)&B, sizeof(B));
+    size_pred = fC.tellg();
+    fC.close();
+    bool stip = true, higher = true;
+    for (int i = 0; i < 4; i++)
+    {
+        if (B.a[i] != 5)
+            higher = false;
+        if (B.a[i] <= 3)
+            stip = false;
+    }
+    if (stip && higher)
+        answer = 2;
+    else
+        if (stip)
+            answer = 1;
+        else
+            answer = 0;
+    fC.seekg(0, ios::beg);
+    string temp;
+    fC.read((char*)&temp, sizeof(char)); //fC >> temp;
+    string s2 = "H:/test/" + temp + ".bin";
+    const char* client = { s2.c_str() };
+    fC.close();
 
-		{
-			Sleep(100); fR.seekg(0, ios::end);
-		}
-		fR.seekg(size_pred, ios::beg);
-		fR.read((char*)&B, sizeof(B));
-		size_pred = fR.tellg();
-		fR.close();
-		double IMT = B.weight / (0.01 * B.height) / (0.01 * B.height);
-
-		if (18.5 <= IMT && IMT < 25) answer = 1;
-
-		if (18.5 > IMT) answer = 0;
-
-		if (IMT >= 25)answer = 2;
-		fA.open(nameA, ios::binary | ios::app);
-		fA.write((char*)&answer, sizeof(answer));
-		fA.close();
-
-	}
+    fA.open(client, ios::binary | ios::app);
+    fA.write((char*)&answer, sizeof(answer));
+    fA.close();
 }
+}
+
+*/
