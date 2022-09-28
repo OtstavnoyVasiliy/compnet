@@ -1,0 +1,158 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <windows.h>
+using namespace std;
+
+struct Person
+{
+    char name[25];
+    int a[4];
+}A;
+
+void main()
+{
+    setlocale(LC_ALL, "rus");
+    const char* con = { "H:/test/conv.txt" };
+    ofstream f_REQ;
+    ifstream f_ANS;
+    ofstream kostil;
+    fstream fC;
+    long pred_size;
+    int answer;
+
+    fC.open(con);
+    int temp;
+    fC >> temp;
+    fC.seekg(0, ios::beg);
+    temp++;
+    fC << temp << endl;;
+    string str = to_string (temp);
+    fC.close();
+    string s2 = "H:/test/" + str + ".txt";
+    const char* client = { s2.c_str() };
+    while (true)
+    {
+        kostil.open(client);
+        f_ANS.open(client);
+        f_ANS.seekg(0, ios::end);
+        pred_size = f_ANS.tellg();
+        cout << "Vvedite zapros: familiya, ocenki" << endl;
+        cin >> A.name;
+        for (int i = 0; i < 4; i++)
+            cin >> A.a[i];
+        cout << A.name << endl;
+        for (int i = 0; i < 4; i++)
+            cout << A.a[i];
+        fC.open(con, ios::app | ios::in | ios::out);
+        fC << A.name << endl;
+        for (int i = 0; i < 4; i++)
+            fC << A.a[i] << endl;
+        fC.close();
+
+       // f_ANS.open(client);
+
+
+        while (pred_size == f_ANS.tellg())
+        {
+            Sleep(100);
+            f_ANS.seekg(0, ios::end);
+        }
+        f_ANS.seekg(pred_size, ios::beg);
+        f_ANS >> answer;
+        pred_size = f_ANS.tellg();
+        f_ANS.close();
+
+
+        switch (answer)
+        {
+        case 0: {cout << "Net stip \n"; break; }
+        case 1: {cout << "Norma stip \n"; break; }
+        case 2: {cout << "High stip\n"; break; }
+        }
+
+
+
+        
+
+    }
+    std::cout << "Hello World!\n";
+}
+
+/*#include <iostream>
+#include <fstream>
+#include <string>
+#include <windows.h>
+using namespace std;
+
+struct Person
+{
+    char name[25];
+    int a[4];
+}A;
+
+void main()
+{
+    setlocale(LC_ALL, "rus");
+    const char* nameR = "H:/test/REQUEST.bin";
+    const char* nameA = "H:/test/ANSWER.bin";
+    const char* con = { "H:/test/conv.bin" };
+    ofstream f_REQ;
+    ifstream f_ANS;
+    fstream fC;
+    long pred_size;
+    int answer;
+
+    fC.open(con, ios::binary);
+    string temp;
+    fC.read((char*)&temp, sizeof(char));
+    //fC >> temp;
+    fC.seekg(0, ios::beg);
+   // temp++;
+
+    //fC << temp << endl;;
+   // string str = to_string (temp);
+    //fC.write((char*)&str, sizeof(string));
+    //string s2 = "H:/test/" + str + ".bin";
+    //const char* client = { s2.c_str() };
+    while (true)
+    {
+        cout << "Vvedite zapros: familiya, ocenki" << endl;
+        cin >> A.name;
+        for (int i = 0; i < 4; i++)
+            cin >> A.a[i];
+        cout << A.name << endl;
+        for (int i = 0; i < 4; i++)
+            cout << A.a[i];
+        fC.open(con, ios::app | ios::binary | ios::in | ios::out);
+        fC.write((char*)&A, sizeof(A));
+        fC.close();
+
+
+       // f_ANS.open(client, ios::binary | ios::in);
+        f_ANS.seekg(0, ios::end);
+        pred_size = f_ANS.tellg();
+        while (pred_size >= f_ANS.tellg())
+        {
+            Sleep(100);
+            f_ANS.seekg(0, ios::end);
+        }
+        f_ANS.seekg(pred_size, ios::beg);
+        f_ANS.read((char*)&answer, sizeof(answer));
+        f_ANS.close();
+
+
+        switch (answer)
+        {
+        case 0: {cout << "Net stip \n"; break; }
+        case 1: {cout << "Norma stip \n"; break; }
+        case 2: {cout << "High stip\n"; break; }
+        }
+
+
+
+
+
+    }
+    std::cout << "Hello World!\n";
+}*/
