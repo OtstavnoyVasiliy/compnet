@@ -1,158 +1,82 @@
+#include <string>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS  // подавление предупреждений библиотеки winsock2
+#include <winsock2.h>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <windows.h>
+#pragma comment (lib,"Ws2_32.lib")
+#pragma warning(disable: 4996)  // подавление предупреждения 4996
 using namespace std;
+#define request "GET / HTTP/1.0\r\nHost:www.neverssl.com\r\n\r\n" //html запрос.
+#define max_packet_size   65535
+int main() {
+    WSADATA ws; //структура, содержащая информацию про версию библиотеки Winsock
+    SOCKET s;
+    sockaddr_in adr;
+    HOSTENT* hostname;
+    char    buff[max_packet_size];
 
-struct Person
-{
-    char name[25];
-    int a[4];
-}A;
-
-void main()
-{
-    setlocale(LC_ALL, "rus");
-    const char* con = { "H:/test/conv.txt" };
-    ofstream f_REQ;
-    ifstream f_ANS;
-    ofstream kostil;
-    fstream fC;
-    long pred_size;
-    int answer;
-
-    fC.open(con);
-    int temp;
-    fC >> temp;
-    fC.seekg(0, ios::beg);
-    temp++;
-    fC << temp << endl;;
-    string str = to_string (temp);
-    fC.close();
-    string s2 = "H:/test/" + str + ".txt";
-    const char* client = { s2.c_str() };
-    while (true)
-    {
-        kostil.open(client);
-        f_ANS.open(client);
-        f_ANS.seekg(0, ios::end);
-        pred_size = f_ANS.tellg();
-        cout << "Vvedite zapros: familiya, ocenki" << endl;
-        cin >> A.name;
-        for (int i = 0; i < 4; i++)
-            cin >> A.a[i];
-        cout << A.name << endl;
-        for (int i = 0; i < 4; i++)
-            cout << A.a[i];
-        fC.open(con, ios::app | ios::in | ios::out);
-        fC << A.name << endl;
-        for (int i = 0; i < 4; i++)
-            fC << A.a[i] << endl;
-        fC.close();
-
-       // f_ANS.open(client);
-
-
-        while (pred_size == f_ANS.tellg())
-        {
-            Sleep(100);
-            f_ANS.seekg(0, ios::end);
-        }
-        f_ANS.seekg(pred_size, ios::beg);
-        f_ANS >> answer;
-        pred_size = f_ANS.tellg();
-        f_ANS.close();
-
-
-        switch (answer)
-        {
-        case 0: {cout << "Net stip \n"; break; }
-        case 1: {cout << "Norma stip \n"; break; }
-        case 2: {cout << "High stip\n"; break; }
-        }
-
-
-
-        
-
+    if (WSAStartup(MAKEWORD(2, 2), &ws) != 0) { // создаём структура данных о версии библиотеки Winsock
+        cout << "Error with Library Winsock" << endl;
+        return -1;
     }
-    std::cout << "Hello World!\n";
+
+    s = socket(AF_INET, SOCK_STREAM, 0);     // создаём сокет
+
+    if (s == -1)
+    {
+        cout << "Error with socket" << endl;
+        return -1;
+    }
+    hostname = gethostbyname("www.neverssl.com");   // получаем адрес
+
+    if (hostname == NULL)
+    {
+        cout << "Error with HostName" << endl;
+        return -1;
+    }
+
+    // заполняем  поля структуры сокета adr
+    adr.sin_family = AF_INET;
+    ((unsigned long*)&adr.sin_addr)[0] = ((unsigned long**)hostname->h_addr_list)[0][0];
+    adr.sin_port = htons(80);
+
+    // устанавливаем соединение с сервером
+    int c = connect(s, (sockaddr*)&adr, sizeof(adr));
+    //cout << "hi \n";
+    if (c == -1)
+    {
+        cerr << "listen failed with error: " << WSAGetLastError() << endl;
+        cout << "Error with Connect" << endl;
+        return -1;
+    }
+
+    int Send = send(s, (char*)&request, sizeof(request), 0);     // посылаем запрос серверу
+    if (Send == -1)
+    {
+        cout << "Error with Send" << endl;
+        return -1;
+    }
+
+
+    int msg = 0;
+    do
+    {
+        int msg = recv(s, (char*)&buff, max_packet_size, 0);
+        if (msg == -1)
+        {
+            cout << "Error with Recieve" << endl;
+            return -1;
+        }
+        for (int i = 0; i < msg; i++)
+            cout << buff[i];
+
+    } while (msg != 0);
+
+    int cs = closesocket(s);
+    if (cs == 1)   // закрываем соединение 
+    {
+        cout << "Error with CloseSocket" << endl;
+        return -1;
+    }
+    cin.get();
+    WSACleanup();
 }
-
-/*#include <iostream>
-#include <fstream>
-#include <string>
-#include <windows.h>
-using namespace std;
-
-struct Person
-{
-    char name[25];
-    int a[4];
-}A;
-
-void main()
-{
-    setlocale(LC_ALL, "rus");
-    const char* nameR = "H:/test/REQUEST.bin";
-    const char* nameA = "H:/test/ANSWER.bin";
-    const char* con = { "H:/test/conv.bin" };
-    ofstream f_REQ;
-    ifstream f_ANS;
-    fstream fC;
-    long pred_size;
-    int answer;
-
-    fC.open(con, ios::binary);
-    string temp;
-    fC.read((char*)&temp, sizeof(char));
-    //fC >> temp;
-    fC.seekg(0, ios::beg);
-   // temp++;
-
-    //fC << temp << endl;;
-   // string str = to_string (temp);
-    //fC.write((char*)&str, sizeof(string));
-    //string s2 = "H:/test/" + str + ".bin";
-    //const char* client = { s2.c_str() };
-    while (true)
-    {
-        cout << "Vvedite zapros: familiya, ocenki" << endl;
-        cin >> A.name;
-        for (int i = 0; i < 4; i++)
-            cin >> A.a[i];
-        cout << A.name << endl;
-        for (int i = 0; i < 4; i++)
-            cout << A.a[i];
-        fC.open(con, ios::app | ios::binary | ios::in | ios::out);
-        fC.write((char*)&A, sizeof(A));
-        fC.close();
-
-
-       // f_ANS.open(client, ios::binary | ios::in);
-        f_ANS.seekg(0, ios::end);
-        pred_size = f_ANS.tellg();
-        while (pred_size >= f_ANS.tellg())
-        {
-            Sleep(100);
-            f_ANS.seekg(0, ios::end);
-        }
-        f_ANS.seekg(pred_size, ios::beg);
-        f_ANS.read((char*)&answer, sizeof(answer));
-        f_ANS.close();
-
-
-        switch (answer)
-        {
-        case 0: {cout << "Net stip \n"; break; }
-        case 1: {cout << "Norma stip \n"; break; }
-        case 2: {cout << "High stip\n"; break; }
-        }
-
-
-
-
-
-    }
-    std::cout << "Hello World!\n";
-}*/
